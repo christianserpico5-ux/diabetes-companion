@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="theme-color" content="#3B82F6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="description" content="Your personal diabetes companion - track meals, blood sugar, and get insulin dose suggestions"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="apple-mobile-web-app-capable" content="yes"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="apple-mobile-web-app-status-bar-style" content="default"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="apple-mobile-web-app-title" content="Diabetes Companion"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Diabetes Companion&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="manifest" href="manifest.json"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overscroll-behavior: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>-webkit-overflow-scrolling: touch;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.install-prompt {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>animation: slideUp 0.3s ease-out;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes slideUp {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>from { transform: translateY(100%); }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>to { transform: translateY(0); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="root"&gt;&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script type="text/babel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const { useState, useRef, useEffect } = React;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function DiabetesCompanion() {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const [messages, setMessages] = useState([</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{</p>
+<p class="p1"><span class="Apple-converted-space">              </span>role: 'assistant',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>content: "Hi! I'm your diabetes companion. 💙 I'm here to help make managing diabetes easier. You can:\n\n• Take a photo of your meal for carb estimates\n• Log your blood sugar readings\n• Ask questions anytime\n• Get personalized insights\n\nHow can I help you today?",</p>
+<p class="p1"><span class="Apple-converted-space">              </span>timestamp: new Date()</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>]);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const [input, setInput] = useState('');</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const [isLoading, setIsLoading] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const [showSettings, setShowSettings] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const [showInstall, setShowInstall] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const [deferredPrompt, setDeferredPrompt] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const [settings, setSettings] = useState({</p>
+<p class="p1"><span class="Apple-converted-space">            </span>carbRatio: 10,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>correctionFactor: 50,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>targetLow: 80,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>targetHigh: 180,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>userName: "there"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>});</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const fileInputRef = useRef(null);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const messagesEndRef = useRef(null);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const scrollToBottom = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>scrollToBottom();</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}, [messages]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>loadSettings();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>loadMessages();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// PWA install prompt</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.addEventListener('beforeinstallprompt', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setDeferredPrompt(e);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setShowInstall(true);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Register service worker</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if ('serviceWorker' in navigator) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>navigator.serviceWorker.register('/sw.js').catch(err =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log('Service worker registration failed:', err);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const handleInstall = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (deferredPrompt) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>deferredPrompt.prompt();</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const { outcome } = await deferredPrompt.userChoice;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setDeferredPrompt(null);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setShowInstall(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>// iOS fallback instructions</p>
+<p class="p1"><span class="Apple-converted-space">              </span>alert('To install:\n1. Tap the Share button\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const loadSettings = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const result = await window.storage.get('diabetes-settings');</p>
+<p class="p1"><span class="Apple-converted-space">              </span>if (result) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setSettings(JSON.parse(result.value));</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>console.log('No saved settings yet');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const saveSettings = async (newSettings) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setSettings(newSettings);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>await window.storage.set('diabetes-settings', JSON.stringify(newSettings));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>console.error('Failed to save settings:', error);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const loadMessages = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const result = await window.storage.get('diabetes-messages');</p>
+<p class="p1"><span class="Apple-converted-space">              </span>if (result) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const saved = JSON.parse(result.value);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setMessages(saved.map(msg =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>...msg,</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>timestamp: new Date(msg.timestamp)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>})));</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>console.log('No saved messages yet');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const saveMessages = async (msgs) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>await window.storage.set('diabetes-messages', JSON.stringify(msgs));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>console.error('Failed to save messages:', error);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const handleImageUpload = async (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const file = e.target.files[0];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!file) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const reader = new FileReader();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>reader.onloadend = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const base64Image = reader.result.split(',')[1];</p>
+<p class="p2"><span class="Apple-converted-space">              </span></p>
+<p class="p1"><span class="Apple-converted-space">              </span>const userMessage = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>role: 'user',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>content: 'Photo of my meal',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>image: reader.result,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>timestamp: new Date()</p>
+<p class="p1"><span class="Apple-converted-space">              </span>};</p>
+<p class="p2"><span class="Apple-converted-space">              </span></p>
+<p class="p1"><span class="Apple-converted-space">              </span>const updatedMessages = [...messages, userMessage];</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setMessages(updatedMessages);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>await saveMessages(updatedMessages);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setIsLoading(true);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch('https://api.anthropic.com/v1/messages', {</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>method: 'POST',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>headers: {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>'Content-Type': 'application/json',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>body: JSON.stringify({</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>model: 'claude-sonnet-4-20250514',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>max_tokens: 1000,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>messages: [</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>role: 'user',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>content: [</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>type: 'image',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>source: {</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>type: 'base64',</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>media_type: file.type,</p>
+<p class="p1"><span class="Apple-converted-space">                              </span>data: base64Image</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>type: 'text',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>text: `You are a supportive diabetes companion app. The user has Omnipod insulin pump. Analyze this meal photo and provide:</p>
+<p class="p2"><br></p>
+<p class="p1">1. What foods you see</p>
+<p class="p1">2. Estimated total carbs (be specific with portions)</p>
+<p class="p1">3. Suggested insulin bolus based on these settings:</p>
+<p class="p1"><span class="Apple-converted-space">   </span>- Carb ratio: 1 unit per ${settings.carbRatio}g carbs</p>
+<p class="p1"><span class="Apple-converted-space">   </span>- Correction factor: 1 unit drops blood sugar ${settings.correctionFactor} mg/dL</p>
+<p class="p1"><span class="Apple-converted-space">   </span>- Target range: ${settings.targetLow}-${settings.targetHigh} mg/dL</p>
+<p class="p2"><br></p>
+<p class="p1">Format your response in a friendly, conversational way. Show the math for the bolus calculation. Always remind them this is a suggestion to verify with their Omnipod, not medical advice.</p>
+<p class="p2"><br></p>
+<p class="p1">Keep it warm and supportive - this is for someone managing diabetes daily.`</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>})</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const data = await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const assistantMessage = {</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>role: 'assistant',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>content: data.content[0].text,</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>timestamp: new Date()</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const newMessages = [...updatedMessages, assistantMessage];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>await saveMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const errorMessage = {</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>role: 'assistant',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>content: "I'm having trouble analyzing that image right now. Could you try again or describe your meal to me?",</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>timestamp: new Date()</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const newMessages = [...updatedMessages, errorMessage];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>await saveMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>setIsLoading(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>reader.readAsDataURL(file);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const sendMessage = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!input.trim()) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const userMessage = {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>role: 'user',</p>
+<p class="p1"><span class="Apple-converted-space">              </span>content: input,</p>
+<p class="p1"><span class="Apple-converted-space">              </span>timestamp: new Date()</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const updatedMessages = [...messages, userMessage];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setMessages(updatedMessages);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>await saveMessages(updatedMessages);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setInput('');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setIsLoading(true);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const conversationHistory = updatedMessages.slice(-10).map(msg =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">                </span>role: msg.role,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>content: msg.image ? 'Photo of meal' : msg.content</p>
+<p class="p1"><span class="Apple-converted-space">              </span>}));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>const response = await fetch('https://api.anthropic.com/v1/messages', {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>method: 'POST',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>headers: {</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>'Content-Type': 'application/json',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                </span>body: JSON.stringify({</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>model: 'claude-sonnet-4-20250514',</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>max_tokens: 1000,</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>system: `You are a warm, supportive diabetes companion app for someone using an Omnipod insulin pump.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1">User settings:</p>
+<p class="p1">- Carb ratio: 1:${settings.carbRatio} (1 unit per ${settings.carbRatio}g carbs)</p>
+<p class="p1">- Correction factor: 1:${settings.correctionFactor} (1 unit drops ${settings.correctionFactor} mg/dL)</p>
+<p class="p1">- Target range: ${settings.targetLow}-${settings.targetHigh} mg/dL</p>
+<p class="p1">- Name: ${settings.userName}</p>
+<p class="p2"><br></p>
+<p class="p1">You help with:</p>
+<p class="p1">- Logging blood sugar readings and providing context</p>
+<p class="p1">- Estimating carbs from meal descriptions</p>
+<p class="p1">- Calculating insulin bolus suggestions (always show your math)</p>
+<p class="p1">- Answering diabetes questions with empathy</p>
+<p class="p1">- Identifying patterns over time</p>
+<p class="p1">- Providing encouragement</p>
+<p class="p2"><br></p>
+<p class="p1">Always:</p>
+<p class="p1">- Be conversational and supportive, not clinical</p>
+<p class="p1">- Show calculations clearly when suggesting insulin doses</p>
+<p class="p1">- Remind users to verify doses with their Omnipod</p>
+<p class="p1">- Add disclaimers that this is not medical advice</p>
+<p class="p1">- Celebrate wins and empathize with challenges</p>
+<p class="p1">- Keep responses concise unless detail is needed`,</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>messages: conversationHistory</p>
+<p class="p1"><span class="Apple-converted-space">                </span>})</p>
+<p class="p1"><span class="Apple-converted-space">              </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>const data = await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const assistantMessage = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>role: 'assistant',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>content: data.content[0].text,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>timestamp: new Date()</p>
+<p class="p1"><span class="Apple-converted-space">              </span>};</p>
+<p class="p2"><span class="Apple-converted-space">              </span></p>
+<p class="p1"><span class="Apple-converted-space">              </span>const newMessages = [...updatedMessages, assistantMessage];</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>await saveMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const errorMessage = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>role: 'assistant',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>content: "I'm having trouble responding right now. Please try again in a moment.",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>timestamp: new Date()</p>
+<p class="p1"><span class="Apple-converted-space">              </span>};</p>
+<p class="p1"><span class="Apple-converted-space">              </span>const newMessages = [...updatedMessages, errorMessage];</p>
+<p class="p1"><span class="Apple-converted-space">              </span>setMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">              </span>await saveMessages(newMessages);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>setIsLoading(false);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 to-purple-50"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Install Prompt */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{showInstall &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="install-prompt bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 flex justify-between items-center shadow-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="flex-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p className="font-semibold"&gt;Install Diabetes Companion&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p className="text-sm text-blue-100"&gt;Get quick access from your home screen&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={handleInstall}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>Install</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={() =&gt; setShowInstall(false)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className="ml-2 text-white hover:text-blue-100"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>✕</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Header */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="bg-gradient-to-br from-blue-500 to-purple-500 p-2 rounded-xl"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h1 className="text-xl font-bold text-gray-800"&gt;Diabetes Companion&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p className="text-sm text-gray-500"&gt;Your personal health partner&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>onClick={() =&gt; setShowSettings(!showSettings)}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>className="p-2 hover:bg-gray-100 rounded-lg transition-colors"</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Settings Panel */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{showSettings &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="bg-white border-b border-gray-200 p-4 shadow-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;h3 className="font-semibold text-gray-800 mb-3"&gt;Settings&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="grid grid-cols-2 gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;label className="text-sm text-gray-600 block mb-1"&gt;Your Name&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type="text"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>value={settings.userName}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onChange={(e) =&gt; saveSettings({...settings, userName: e.target.value})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;label className="text-sm text-gray-600 block mb-1"&gt;Carb Ratio (1:{settings.carbRatio})&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>value={settings.carbRatio}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onChange={(e) =&gt; saveSettings({...settings, carbRatio: parseInt(e.target.value) || 10})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;label className="text-sm text-gray-600 block mb-1"&gt;Correction Factor (1:{settings.correctionFactor})&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>value={settings.correctionFactor}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>onChange={(e) =&gt; saveSettings({...settings, correctionFactor: parseInt(e.target.value) || 50})}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;label className="text-sm text-gray-600 block mb-1"&gt;Target Range&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>value={settings.targetLow}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>onChange={(e) =&gt; saveSettings({...settings, targetLow: parseInt(e.target.value) || 80})}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>placeholder="Low"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>type="number"</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>value={settings.targetHigh}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>onChange={(e) =&gt; saveSettings({...settings, targetHigh: parseInt(e.target.value) || 180})}</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>placeholder="High"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Messages */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex-1 overflow-y-auto p-4 space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{messages.map((msg, idx) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`max-w-[80%] rounded-2xl p-4 ${</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>msg.role === 'user'<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>? 'bg-gradient-to-br from-blue-500 to-purple-500 text-white'<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>: 'bg-white shadow-md text-gray-800'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>{msg.image &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;img src={msg.image} alt="Meal" className="rounded-lg mb-2 max-w-full" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className="whitespace-pre-wrap"&gt;{msg.content}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;p className={`text-xs mt-2 ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-400'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{isLoading &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div className="flex justify-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="bg-white shadow-md rounded-2xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;div className="flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div ref={messagesEndRef} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>{/* Input Area */}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="bg-white border-t border-gray-200 p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>type="file"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>ref={fileInputRef}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onChange={handleImageUpload}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>accept="image/*"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>capture="environment"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className="hidden"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={() =&gt; fileInputRef.current?.click()}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className="p-3 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-xl hover:shadow-lg transition-all"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>disabled={isLoading}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>type="text"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>value={input}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onChange={(e) =&gt; setInput(e.target.value)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onKeyPress={(e) =&gt; e.key === 'Enter' &amp;&amp; sendMessage()}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>placeholder="Type a message or log your blood sugar..."</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>disabled={isLoading}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>onClick={sendMessage}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>disabled={!input.trim() || isLoading}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>className="p-3 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p className="text-xs text-gray-500 mt-2 text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>This app provides suggestions only. Always verify doses and consult your healthcare provider.</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>ReactDOM.render(&lt;DiabetesCompanion /&gt;, document.getElementById('root'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
